@@ -5,6 +5,17 @@ import errorHandler from './errorHandler';
 import getStdin from 'get-stdin';
 import chalk from 'chalk';
 
+const algoliaDefaultRanking = [
+    'typo',
+    'geo',
+    'words',
+    'filters',
+    'proximity',
+    'attribute',
+    'exact',
+    'custom'
+];
+
 const main = async () => {
     config();
     checkEnv(['ALGOLIA_INDEX_NAME', 'ALGOLIA_APP_ID', 'ALGOLIA_WRITE_KEY']);
@@ -25,11 +36,15 @@ const main = async () => {
 
     console.warn(`Updating index settings`);
     await index.setSettings({
-        searchableAttributes: ['pageName'],
+        searchableAttributes: ['pageName', 'tags'],
         attributesForFaceting: [
             'searchable(tags)',
             'searchable(category)',
             'searchable(eventLevel)'
+        ],
+        ranking: [
+            'desc(internal)', //show application-level items first, then go FAQs, videos, etc
+            ...algoliaDefaultRanking
         ]
     });
 
