@@ -24,7 +24,7 @@ const addLineNumber = (row, i) => {
 const validateFieldNames = fieldNames => {
     expect(fieldNames).to.be.an('array');
     const message =
-        'first line of should contain "pageUrl", "category", "pageName", "eventLevel", "internal", "icon" and "tags"';
+        'first line should contain "pageUrl", "category", "pageName", "eventLevel", "internal", "icon" and "tags"';
     expect(fieldNames, message).to.include('tags');
     expect(fieldNames, message).to.include('pageUrl');
     expect(fieldNames, message).to.include('category');
@@ -35,7 +35,7 @@ const validateFieldNames = fieldNames => {
 };
 
 const validate = ({ lineNumber, values }) => {
-    const { pageUrl, pageName, eventLevel } = values;
+    const { pageUrl, pageName, eventLevel, internal } = values;
     try {
         expect(pageUrl, '"pageUrl" must be set').not.to.be.empty;
         expect(
@@ -44,10 +44,21 @@ const validate = ({ lineNumber, values }) => {
                 pageUrl.startsWith('https://'),
             '"pageUrl" must start with "/", "http://" || "https://"'
         ).to.be.ok;
+
         expect(
-            eventLevel === 'true' || eventLevel === 'false',
-            '"eventLevel" should be either "true" or "false"'
-        );
+            eventLevel.toLowerCase(),
+            `"eventLevel" should be either "true" or "false", not ${JSON.stringify(
+                eventLevel
+            )}`
+        ).to.be.oneOf(['true', 'false']);
+
+        expect(
+            internal.toLowerCase(),
+            `"internal" should be either "true" or "false", not ${JSON.stringify(
+                internal
+            )}`
+        ).to.be.oneOf(['true', 'false']);
+
         expect(pageName, '"pageName" must be set').not.to.be.empty;
 
         return { lineNumber, values };
@@ -63,8 +74,8 @@ const normalize = ({ values }) => {
     const { eventLevel, internal } = values;
     return {
         ...values,
-        eventLevel: eventLevel.includes('true'),
-        internal: internal.includes('true')
+        eventLevel: eventLevel.toLowerCase().includes('true'),
+        internal: internal.toLowerCase().includes('true')
     };
 };
 
