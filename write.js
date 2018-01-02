@@ -36,6 +36,7 @@ const main = async () => {
 
     console.warn(`Updating index settings`);
     await index.setSettings({
+        hitsPerPage: 200,
         searchableAttributes: ['pageName', 'tags'],
         attributesForFaceting: [
             'searchable(tags)',
