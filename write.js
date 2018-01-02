@@ -44,6 +44,7 @@ const main = async () => {
         ],
         ranking: [
             'desc(internal)', //show application-level items first, then go FAQs, videos, etc
+            'asc(priority)', //order by priority
             ...algoliaDefaultRanking
         ]
     });
