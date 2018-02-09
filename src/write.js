@@ -16,7 +16,7 @@ const algoliaDefaultRanking = [
     'custom'
 ];
 
-const main = async () => {
+const main = async ({ input, log }) => {
     config();
     checkEnv(['ALGOLIA_INDEX_NAME', 'ALGOLIA_APP_ID', 'ALGOLIA_WRITE_KEY']);
 
@@ -27,14 +27,12 @@ const main = async () => {
     } = process.env;
     const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_WRITE_KEY);
 
-    const inputData = JSON.parse(await getStdin());
-
     const index = client.initIndex(ALGOLIA_INDEX_NAME);
 
-    console.warn(`Clearing the existing index ${ALGOLIA_INDEX_NAME}`);
+    log(`Clearing the existing index ${ALGOLIA_INDEX_NAME}`);
     await index.clearIndex();
 
-    console.warn(`Updating index settings`);
+    log(`Updating index settings`);
     await index.setSettings({
         hitsPerPage: 200,
         searchableAttributes: ['pageName', 'tags'],
@@ -50,16 +48,26 @@ const main = async () => {
         ]
     });
 
-    console.warn(
-        `Adding ${inputData.length} objects to index ${ALGOLIA_INDEX_NAME}`
-    );
-    await index.addObjects(inputData);
+    log(`Adding ${input.length} objects to index ${ALGOLIA_INDEX_NAME}`);
+    await index.addObjects(input);
 
-    console.warn(
+    log(
         chalk.white.bgGreen.bold(
             'Congratulations! Your index has been synchronized successfully'
         )
     );
 };
 
-main().catch(errorHandler);
+if (!module.parent) {
+    getStdin().then(inputData => {
+        return main({
+            input: JSON.parse(inputData),
+            log: console.warn.bind(console)
+        }).then(
+            res => console.log(JSON.stringify(res, false, 2)),
+            errorHandler
+        );
+    });
+}
+
+module.exports = main;

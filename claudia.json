@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "algolia-sync-executor",
+    "name": "algolia-sync",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "sxyaz34d48",
+    "module": "dist/lambda"
+  }
+}

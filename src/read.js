@@ -19,24 +19,30 @@ const authenticateAsGoogleServiceAccount = async (email, key) => {
     return jwtClient;
 };
 
-const main = async () => {
+const main = async ({ log }) => {
     config();
     checkEnv([
-        'GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY',
         'GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL',
         'GOOGLE_SPREADSHEET_ID',
         'GOOGLE_SPREADSHEET_RANGES'
     ]);
     const {
         GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+        GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_hex,
         GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
         GOOGLE_SPREADSHEET_ID,
         GOOGLE_SPREADSHEET_RANGES
     } = process.env;
 
+    const googlePK =
+        GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ||
+        new Buffer(GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_hex, 'hex').toString(
+            'utf8'
+        );
+
     const authClient = await authenticateAsGoogleServiceAccount(
         GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
-        GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+        googlePK
     );
 
     const sheetsAPI = goog.sheets({
@@ -50,19 +56,26 @@ const main = async () => {
     for (var i = 0; i < ranges.length; i++) {
         const range = ranges[i];
 
-        console.warn(`Retrieving range ${range}`);
+        log(`Retrieving range ${range}`);
         const [rangeData] = await nfcall(sheetsAPI.spreadsheets.values.get, {
             range,
             spreadsheetId: GOOGLE_SPREADSHEET_ID
         });
-        console.warn(`Retrieved ${rangeData.values.length} rows`);
+        log(`Retrieved ${rangeData.values.length} rows`);
 
         const parsedData = cellsToJson(rangeData.values);
         mergedData = mergedData.concat(parsedData);
     }
 
-    console.log(JSON.stringify(mergedData, false, 2));
-    console.warn(`${mergedData.length} records processed`);
+    log(`${mergedData.length} records processed`);
+    return mergedData;
 };
 
-main().catch(errorHandler);
+if (!module.parent) {
+    main({ log: console.warn.bind(console) }).then(
+        res => console.log(JSON.stringify(res, false, 2)),
+        errorHandler
+    );
+}
+
+module.exports = main;
