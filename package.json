@@ -34,7 +34,6 @@
         "claudia-api-builder": "^3.0.2",
         "dotenv": "^4.0.0",
         "get-stdin": "^5.0.1",
-        "google-auth-library": "1.6.1",
         "googleapis": "^23.0.2",
         "lodash": "^4.17.15",
         "q": "^1.5.1"

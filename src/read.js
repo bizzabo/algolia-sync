@@ -1,4 +1,3 @@
-import GoogleAuth from 'google-auth-library';
 import goog from 'googleapis';
 import { nfcall } from 'q';
 import cellsToJson from './cellsToJson';
@@ -7,8 +6,7 @@ import checkEnv from './checkEnv';
 import errorHandler from './errorHandler';
 
 const authenticateAsGoogleServiceAccount = async (email, key) => {
-    const auth = new GoogleAuth();
-    const jwtClient = new auth.JWT(
+    const jwtClient = new goog.auth.JWT(
         email,
         null,
         key,
