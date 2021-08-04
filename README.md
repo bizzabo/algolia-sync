@@ -1,5 +1,8 @@
 # algolia-sync
 
+## Description
+This repo is needed for managing the Algolia search which is used in web-dashboard. The data is stored in a google spreadsheet (the link is below). These scripts are needed because you are not able to make changes via algolia UI. To have access to the algolia account ask the IT director to give you access to the Algolia credentials via LastPass. The flow for update data is: update spreadsheets -> clone repo -> `npm i` -> `npm run sync`.
+
 ## Configure
 
 Get the `.env`-file with credentials, try Iryna, Eran G, or Royi
